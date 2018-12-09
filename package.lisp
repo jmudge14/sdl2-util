@@ -21,6 +21,7 @@
            #:clear-surface
            #:draw-text
            #:scancode-case
+           #:get-font
            ))
 
 

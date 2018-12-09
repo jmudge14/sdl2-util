@@ -17,7 +17,7 @@
     (destructuring-bind (&key (title "") (w 500) (h 500)) options 
       `(sdl2:with-init (:everything)
          (sdl2:with-window (,win :title ,title :w ,w :h ,h :flags '(:shown))
-           (sdl2:with-renderer (,rend ,win :flags nil)
+           (sdl2:with-renderer (,rend ,win #| :flags nil |#)
              ,@body))))))
 
 (defmacro with-sdl-thread (options &body body)
@@ -25,12 +25,17 @@
   `(bt:make-thread (lambda () (with-initialized-sdl ,options ,@body)) :name "macro sdl thread"))
 
 
-(sdl2-ttf:init)
-(defparameter *font* (sdl2-ttf:open-font "DejaVuSansMono.ttf" 28))
+(defun get-font (name size)
+  "Return an SDL2-TTF font for later use in rendering"
+  (unless (sdl2-ttf:was-init)
+    (sdl2-ttf:init))
+  (sdl2-ttf:open-font name size))
 
-(defun draw-text (rend txt pos-x pos-y &optional (r 255) (g 0) (b 0) (a 255))
+(defun draw-text (rend txt font pos-x pos-y &optional (r 255) (g 0) (b 0) (a 255))
   "Draw the given text on the provided window and surface, optionally provide a color code (default to red)"
-  (let* ((txt-surface (sdl2-ttf:render-text-solid *font* txt r g b a))
+  (unless (sdl2-ttf:was-init)
+    (sdl2-ttf:init))
+  (let* ((txt-surface (sdl2-ttf:render-text-solid font txt r g b a))
          (destination-rect (sdl2:make-rect pos-x
                                            pos-y 
                                            (sdl2:surface-width txt-surface)
