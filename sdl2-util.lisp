@@ -27,13 +27,13 @@
 
 (defun get-font (name size)
   "Return an SDL2-TTF font for later use in rendering"
-  (unless (sdl2-ttf:was-init)
+  (unless (> 0 (sdl2-ttf:was-init))
     (sdl2-ttf:init))
   (sdl2-ttf:open-font name size))
 
 (defun draw-text (rend txt font pos-x pos-y &optional (r 255) (g 0) (b 0) (a 255))
   "Draw the given text on the provided window and surface, optionally provide a color code (default to red)"
-  (unless (sdl2-ttf:was-init)
+  (unless (> 0 (sdl2-ttf:was-init))
     (sdl2-ttf:init))
   (let* ((txt-surface (sdl2-ttf:render-text-solid font txt r g b a))
          (destination-rect (sdl2:make-rect pos-x
@@ -42,8 +42,9 @@
                                            (sdl2:surface-height txt-surface)))
          (texture (sdl2:create-texture-from-surface rend txt-surface)))
     (sdl2:render-copy rend texture :dest-rect destination-rect)
-    ;(sdl2:free-rect destination-rect) ; prevent memory leak from repeated calls
-    ;(sdl2:free-surface txt-surface) ; prevent memory leak from repeated calls
+    ; Release temporary data here
+    ; (sdl2:free-surface txt-surface) ;finalized in sdl2-ttf
+    (sdl2:destroy-texture texture)
     (values)))
 
 (defmacro scancode-case (scancode &rest cases)

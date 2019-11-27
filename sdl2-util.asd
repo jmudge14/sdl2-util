@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:sdl2-util
   :description "Describe sdl2-util here"
-  :author "Jack Mudge <jakykong@theanythingbox.com>"
+  :author "Jack Mudge <jmudge14@gmail.com>"
   :license  "Specify license here"
   :version "0.0.1"
   :serial t
